@@ -1,0 +1,65 @@
+<style>
+    body {
+        margin: 0%;
+        overflow: hidden; 
+    }
+</style>
+
+<canvas id="blur-bg"></canvas>
+
+<script>
+    const canvas = document.getElementById('blur-bg')
+    const ctx = canvas.getContext('2d')
+
+    const colors = {
+        yellow: [238, 186, 66],
+        blue: [13, 63, 244]
+    }
+
+    const setCanvasSize = () => {
+        canvas.width = window.innerWidth 
+        canvas.height = window.innerHeight 
+    }
+    setCanvasSize()
+    window.addEventListener('resize', () => setCanvasSize())
+
+    const drawYellowGradient = (x, y) => {
+        yellowGradientAngle+=0.3
+        const newColor = colors.yellow.map((_, index) => colors.yellow[index] + (colors.blue[index] - colors.yellow[index]) * 0.2 * Math.sin(yellowGradientAngle))
+        const yellowGradient = ctx.createLinearGradient(x, y, canvas.width / 2.5 + Math.cos(yellowGradientAngle) * 120, canvas.height / 10 + Math.sin(yellowGradientAngle) * -120);
+        yellowGradient.addColorStop(0, `rgba(${newColor.join(',')}, 1)`);
+        yellowGradient.addColorStop(1, `rgba(${newColor.join(',')}, 0)`);
+        ctx.filter = "blur(2px)";
+        let yellowRectWidth = window.innerWidth;
+        let yellowRectHeight = window.innerHeight;
+        let yellowRectX = 0;
+        let yellowRectY = 0;
+        ctx.fillStyle = yellowGradient;
+        ctx.fillRect(yellowRectX, yellowRectY, yellowRectWidth, yellowRectHeight);
+    }
+
+    const drawBlueGradient = (x, y) => {
+        blueGradientAngle+=0.3
+        console.log(Math.cos(blueGradientAngle))
+        const blueGradient = ctx.createRadialGradient(x + Math.cos(blueGradientAngle) * 200, y + Math.sin(blueGradientAngle) * 200, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
+        blueGradient.addColorStop(0.4, 'rgba(13, 63, 244, 1)');
+        blueGradient.addColorStop(0.95, 'rgba(13, 63, 244, 0)');
+        ctx.fillStyle = blueGradient;
+        ctx.filter = "blur(80px)";
+        ctx.beginPath();
+        ctx.ellipse(canvas.width * 0.5, -canvas.height * 0.35, canvas.width / 1.5, canvas.height / 1.5, 0.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    let blueGradientAngle = 0
+    let yellowGradientAngle = 0
+    drawYellowGradient(canvas.width * 0.1, canvas.height * 0.9)
+
+    const drawAnimation = () => {
+
+        ctx.clearRect(-canvas.width * 0.1, -canvas.height * 0.1, canvas.width * 1.2, canvas.height * 1.2); 
+        drawYellowGradient(canvas.width * 0.1, canvas.height * 0.9)
+        drawBlueGradient(canvas.width * 0.4, -canvas.height * 0.25)
+        window.requestAnimationFrame(() => drawAnimation())
+    }
+    drawAnimation()
+</script>
