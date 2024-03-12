@@ -1,3 +1,4 @@
+
 <style>
     body {
         margin: 0%;
@@ -6,16 +7,12 @@
 </style>
 
 <canvas id="blur-bg"></canvas>
-
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/plugins/ColorPropsPlugin.min.js"></script>
 <script>
     const canvas = document.getElementById('blur-bg')
     const ctx = canvas.getContext('2d')
-
-    const colors = {
-        yellow: [238, 186, 66],
-        blue: [13, 63, 244]
-    }
-
+    
     const setCanvasSize = () => {
         canvas.width = window.innerWidth 
         canvas.height = window.innerHeight 
@@ -23,12 +20,24 @@
     setCanvasSize()
     window.addEventListener('resize', () => setCanvasSize())
 
-    const drawYellowGradient = (x, y) => {
-        yellowGradientAngle+=0.3
-        const newColor = colors.yellow.map((_, index) => colors.yellow[index] + (colors.blue[index] - colors.yellow[index]) * 0.2 * Math.sin(yellowGradientAngle))
-        const yellowGradient = ctx.createLinearGradient(x, y, canvas.width / 2.5 + Math.cos(yellowGradientAngle) * 120, canvas.height / 10 + Math.sin(yellowGradientAngle) * -120);
-        yellowGradient.addColorStop(0, `rgba(${newColor.join(',')}, 1)`);
-        yellowGradient.addColorStop(1, `rgba(${newColor.join(',')}, 0)`);
+    let points = {
+        bluex: canvas.width * 0.4,
+        bluey: -canvas.height * 0.25,
+        blueColor: 'rgba(13, 63, 244, 1)',
+        yellowx: canvas.width / 3,
+        yellowy: canvas.height / 10,
+        yellowColor: 'rgba(238, 186, 66, 1)',
+        bluerightx: canvas.width * 0.9,
+        bluerighty: canvas.height * 0.6,
+        blueColor: 'rgba(13, 63, 244, 1)',
+        blueRightColor: 'rgba(63, 101, 240, 1)'
+    }
+
+
+    const drawYellowGradient = () => {
+        const yellowGradient = ctx.createLinearGradient(canvas.width * 0.1, canvas.height * 0.9, points.yellowx, points.yellowy);
+        yellowGradient.addColorStop(0, points.yellowColor.slice(0, points.yellowColor.length - 2) + '1)');
+        yellowGradient.addColorStop(1, points.yellowColor.slice(0, points.yellowColor.length - 2) + '0)');
         ctx.filter = "blur(2px)";
         let yellowRectWidth = window.innerWidth;
         let yellowRectHeight = window.innerHeight;
@@ -38,28 +47,48 @@
         ctx.fillRect(yellowRectX, yellowRectY, yellowRectWidth, yellowRectHeight);
     }
 
-    const drawBlueGradient = (x, y) => {
-        blueGradientAngle+=0.3
-        console.log(Math.cos(blueGradientAngle))
-        const blueGradient = ctx.createRadialGradient(x + Math.cos(blueGradientAngle) * 200, y + Math.sin(blueGradientAngle) * 200, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
-        blueGradient.addColorStop(0.4, 'rgba(13, 63, 244, 1)');
-        blueGradient.addColorStop(0.95, 'rgba(13, 63, 244, 0)');
+    const drawBlueGradient = () => {
+        const blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
+        blueGradient.addColorStop(0.4, points.blueColor.slice(0, points.blueColor.length - 2) + '1)');
+        blueGradient.addColorStop(0.95, points.blueColor.slice(0, points.blueColor.length - 2) + '0)');
         ctx.fillStyle = blueGradient;
         ctx.filter = "blur(80px)";
         ctx.beginPath();
         ctx.ellipse(canvas.width * 0.5, -canvas.height * 0.35, canvas.width / 1.5, canvas.height / 1.5, 0.5, 0, Math.PI * 2);
         ctx.fill();
     }
-    let blueGradientAngle = 0
-    let yellowGradientAngle = 0
-    drawYellowGradient(canvas.width * 0.1, canvas.height * 0.9)
 
-    const drawAnimation = () => {
-
-        ctx.clearRect(-canvas.width * 0.1, -canvas.height * 0.1, canvas.width * 1.2, canvas.height * 1.2); 
-        drawYellowGradient(canvas.width * 0.1, canvas.height * 0.9)
-        drawBlueGradient(canvas.width * 0.4, -canvas.height * 0.25)
-        window.requestAnimationFrame(() => drawAnimation())
+    const drawBlueRightGradient = () => {
+        const blueRightGradient = ctx.createRadialGradient(points.bluerightx, points.bluerighty, 0, canvas.width * 0.7, 0, canvas.width / 1.5);
+        blueRightGradient.addColorStop(0, points.blueRightColor.slice(0, points.blueRightColor.length - 2) + '0.8)');
+        blueRightGradient.addColorStop(0.95, points.blueRightColor.slice(0, points.blueRightColor.length - 2) + '0)');
+        ctx.fillStyle = blueRightGradient;
+        ctx.filter = "blur(100px)";
+        ctx.beginPath();
+        ctx.ellipse(canvas.width * 0.75, canvas.height * 0.6, canvas.height / 1.8, canvas.height / 3.5, 0.3, 0, Math.PI * 2);
+        ctx.fill();
     }
-    drawAnimation()
+    let tl = gsap.timeline({repeat: -1, yoyo: true});
+    const animate = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        drawBlueRightGradient()
+        drawYellowGradient()
+        drawBlueGradient()
+
+    }
+    tl.to(points, {
+            duration: 6,
+            bluex: canvas.width * 0.9,
+            bluey: -canvas.height * 0.5,
+            yellowx: canvas.width / 2,
+            yellowy: canvas.height / 4,
+            bluerightx: canvas.width * 1,
+            bluerighty: canvas.height * 0.3,
+            onUpdate: animate,
+            blueColor:'rgba(238, 186, 66, 1)',
+            yellowColor: 'rgba(13, 63, 244, 1)',
+            blueRightColor: 'rgba(15, 30, 83, 1)'
+        });
+
 </script>
+
