@@ -2,7 +2,7 @@
 <style>
     body {
         margin: 0%;
-        overflow: hidden; 
+        overflow: clip; 
     }
 </style>
 
@@ -14,8 +14,9 @@
     const ctx = canvas.getContext('2d')
     
     const setCanvasSize = () => {
-        canvas.width = window.innerWidth 
-        canvas.height = window.innerHeight 
+        
+        canvas.width = document.body.offsetWidth
+        canvas.height = document.body.offsetHeight
     }
     setCanvasSize()
     window.addEventListener('resize', () => setCanvasSize())
@@ -48,13 +49,24 @@
     }
 
     const drawBlueGradient = () => {
-        const blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
+        console.log(canvas.width)
+        let blueGradient
+        if (canvas.width > 768) {
+            blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
+        } else {
+            blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.4, 0, canvas.width * 0.9);
+
+        }
         blueGradient.addColorStop(0.4, points.blueColor.slice(0, points.blueColor.length - 2) + '1)');
         blueGradient.addColorStop(0.95, points.blueColor.slice(0, points.blueColor.length - 2) + '0)');
         ctx.fillStyle = blueGradient;
         ctx.filter = "blur(80px)";
         ctx.beginPath();
-        ctx.ellipse(canvas.width * 0.5, -canvas.height * 0.35, canvas.width / 1.5, canvas.height / 1.5, 0.5, 0, Math.PI * 2);
+        if (canvas.width > 768) {
+            ctx.ellipse(canvas.width * 0.5, -canvas.height * 0.35, canvas.width / 1.5, canvas.height / 1.5, 0.5, 0, Math.PI * 2);
+        } else {
+            ctx.ellipse(canvas.width / 2, -canvas.height * 0.4, canvas.width * 1, canvas.height * 0.8, 1, 0, Math.PI * 2);
+        }
         ctx.fill();
     }
 
@@ -76,21 +88,50 @@
         drawBlueGradient()
 
     }
-    tl.to(points, {
-            duration: 6,
-            delay: 1.4,
-            bluex: canvas.width * 0.9,
-            bluey: -canvas.height * 0.5,
-            yellowx: canvas.width / 2,
-            yellowy: canvas.height / 4,
-            bluerightx: canvas.width * 1,
-            bluerighty: canvas.height * 0.3,
-            onUpdate: animate,
-            blueColor:'rgba(238, 186, 66, 1)',
-            yellowColor: 'rgba(13, 63, 244, 1)',
-            blueRightColor: 'rgba(15, 30, 83, 1)',
-            ease: "sine.inOut"
-        });
+    
+    const init = () => {
+        
+        if (canvas.width > 768) {
+            tl.to(points, {
+                duration: 6,
+                delay: 1.4,
+                bluex: canvas.width * 0.9,
+                bluey: -canvas.height * 0.5,
+                yellowx: canvas.width / 2,
+                yellowy: canvas.height / 4,
+                bluerightx: canvas.width * 1,
+                bluerighty: canvas.height * 0.3,
+                onUpdate: animate,
+                blueColor:'rgba(238, 186, 66, 1)',
+                yellowColor: 'rgba(13, 63, 244, 1)',
+                blueRightColor: 'rgba(15, 30, 83, 1)',
+                ease: "sine.inOut"
+            });
+        } else {
+            points.bluex = 0
+            points.bluey = -canvas.height * 0.6
+            points.bluerightx = canvas.width * 0.7
+            points.bluerighty = canvas.width * 0.5
+            tl.to(points, {
+                duration: 6,
+                delay: 1.4,
+                bluex: canvas.width * 0.9,
+                bluey: -canvas.height * 0.4,
+                yellowx: canvas.width / 2,
+                yellowy: canvas.height / 4,
+                bluerightx: canvas.width * 0.2,
+                bluerighty: canvas.height * 0.1,
+                onUpdate: animate,
+                blueColor:'rgba(238, 186, 66, 1)',
+                yellowColor: 'rgba(13, 63, 244, 1)',
+                blueRightColor: 'rgba(15, 30, 83, 1)',
+                ease: "sine.inOut"
+            });
+        }
+    }
+    window.addEventListener('resize', () => init())
+
+    init()
 
 </script>
 
