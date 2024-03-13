@@ -1,137 +1,232 @@
-
 <style>
-    body {
-        margin: 0%;
-        overflow: clip; 
-    }
+  body {
+    margin: 0%;
+    overflow: clip;
+  }
 </style>
 
 <canvas id="blur-bg"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/plugins/ColorPropsPlugin.min.js"></script>
 <script>
-    const canvas = document.getElementById('blur-bg')
-    const ctx = canvas.getContext('2d')
-    
-    const setCanvasSize = () => {
-        
-        canvas.width = document.body.offsetWidth
-        canvas.height = document.body.offsetHeight
+  const canvas = document.getElementById("blur-bg");
+  const ctx = canvas.getContext("2d");
+
+  const setCanvasSize = () => {
+    canvas.width = document.body.offsetWidth;
+    canvas.height = document.body.offsetHeight;
+  };
+  setCanvasSize();
+  window.addEventListener("resize", () => setCanvasSize());
+
+  let points = {
+    bluex: canvas.width * 0.4,
+    bluey: -canvas.height * 0.25,
+    blueColor: "rgba(13, 63, 244, 1)",
+    yellowx: canvas.width / 3,
+    yellowy: canvas.height / 10,
+    yellowColor: "rgba(238, 186, 66, 1)",
+    bluerightx: canvas.width * 0.9,
+    bluerighty: canvas.height * 0.6,
+    blueRightColor: "rgba(63, 101, 240, 1)",
+    colorTransition: 0,
+  };
+
+  const drawBg = () => {
+    let opacity = points.colorTransition
+    if (opacity > 0.5) {
+        opacity = 0.5 - (opacity - 0.5)
     }
-    setCanvasSize()
-    window.addEventListener('resize', () => setCanvasSize())
+    console.log(opacity)
+    ctx.fillStyle = `rgba(238, 186, 66, ${opacity})`
 
-    let points = {
-        bluex: canvas.width * 0.4,
-        bluey: -canvas.height * 0.25,
-        blueColor: 'rgba(13, 63, 244, 1)',
-        yellowx: canvas.width / 3,
-        yellowy: canvas.height / 10,
-        yellowColor: 'rgba(238, 186, 66, 1)',
-        bluerightx: canvas.width * 0.9,
-        bluerighty: canvas.height * 0.6,
-        blueColor: 'rgba(13, 63, 244, 1)',
-        blueRightColor: 'rgba(63, 101, 240, 1)'
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+
+  const drawYellowGradient = () => {
+    const yellowGradient = ctx.createLinearGradient(
+      canvas.width * 0.1,
+      canvas.height * 0.9,
+      points.yellowx,
+      points.yellowy
+    );
+    yellowGradient.addColorStop(
+      0,
+      points.yellowColor.slice(0, points.yellowColor.length - 2) + (1 - points.colorTransition) + ")"
+    );
+    yellowGradient.addColorStop(1, points.yellowColor.slice(0, points.yellowColor.length - 2) + "0)");
+    ctx.filter = "blur(2px)";
+    ctx.fillStyle = yellowGradient;
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+    const blueGradient = ctx.createLinearGradient(
+      canvas.width * 0.1,
+      canvas.height * 0.9,
+      points.yellowx,
+      points.yellowy
+    );
+    blueGradient.addColorStop(
+      0,
+      points.blueColor.slice(0, points.blueColor.length - 2) + points.colorTransition + ")"
+    );
+    blueGradient.addColorStop(1, points.blueColor.slice(0, points.blueColor.length - 2) + "0)");
+    ctx.filter = "blur(2px)";
+
+    ctx.fillStyle = blueGradient;
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  };
+
+  const drawBlueGradient = () => {
+    let blueGradient;
+    if (canvas.width > 768) {
+      blueGradient = ctx.createRadialGradient(
+        points.bluex,
+        points.bluey,
+        0,
+        canvas.width * 0.7,
+        0,
+        canvas.width / 1.8
+      );
+    } else {
+      blueGradient = ctx.createRadialGradient(
+        points.bluex,
+        points.bluey,
+        0,
+        canvas.width * 0.4,
+        0,
+        canvas.width * 0.9
+      );
     }
-
-
-    const drawYellowGradient = () => {
-        const yellowGradient = ctx.createLinearGradient(canvas.width * 0.1, canvas.height * 0.9, points.yellowx, points.yellowy);
-        yellowGradient.addColorStop(0, points.yellowColor.slice(0, points.yellowColor.length - 2) + '1)');
-        yellowGradient.addColorStop(1, points.yellowColor.slice(0, points.yellowColor.length - 2) + '0)');
-        ctx.filter = "blur(2px)";
-        let yellowRectWidth = window.innerWidth;
-        let yellowRectHeight = window.innerHeight;
-        let yellowRectX = 0;
-        let yellowRectY = 0;
-        ctx.fillStyle = yellowGradient;
-        ctx.fillRect(yellowRectX, yellowRectY, yellowRectWidth, yellowRectHeight);
+    blueGradient.addColorStop(
+      0.4,
+      points.blueColor.slice(0, points.blueColor.length - 2) + (1 - points.colorTransition) + ")"
+    );
+    blueGradient.addColorStop(0.95, points.blueColor.slice(0, points.blueColor.length - 2) + "0)");
+    ctx.fillStyle = blueGradient;
+    ctx.filter = "blur(80px)";
+    ctx.beginPath();
+    if (canvas.width > 768) {
+      ctx.ellipse(
+        canvas.width * 0.5,
+        -canvas.height * 0.35,
+        canvas.width / 1.5,
+        canvas.height / 1.5,
+        0.5,
+        0,
+        Math.PI * 2
+      );
+    } else {
+      ctx.ellipse(
+        canvas.width / 2,
+        -canvas.height * 0.4,
+        canvas.width * 1,
+        canvas.height * 0.8,
+        1,
+        0,
+        Math.PI * 2
+      );
     }
+    ctx.fill();
 
-    const drawBlueGradient = () => {
-        console.log(canvas.width)
-        let blueGradient
-        if (canvas.width > 768) {
-            blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.7, 0, canvas.width / 1.8);
-        } else {
-            blueGradient = ctx.createRadialGradient(points.bluex, points.bluey, 0, canvas.width * 0.4, 0, canvas.width * 0.9);
-
-        }
-        blueGradient.addColorStop(0.4, points.blueColor.slice(0, points.blueColor.length - 2) + '1)');
-        blueGradient.addColorStop(0.95, points.blueColor.slice(0, points.blueColor.length - 2) + '0)');
-        ctx.fillStyle = blueGradient;
-        ctx.filter = "blur(80px)";
-        ctx.beginPath();
-        if (canvas.width > 768) {
-            ctx.ellipse(canvas.width * 0.5, -canvas.height * 0.35, canvas.width / 1.5, canvas.height / 1.5, 0.5, 0, Math.PI * 2);
-        } else {
-            ctx.ellipse(canvas.width / 2, -canvas.height * 0.4, canvas.width * 1, canvas.height * 0.8, 1, 0, Math.PI * 2);
-        }
-        ctx.fill();
+    let yellowGradient;
+    if (canvas.width > 768) {
+      yellowGradient = ctx.createRadialGradient(
+        points.bluex,
+        points.bluey,
+        0,
+        canvas.width * 0.7,
+        0,
+        canvas.width / 1.8
+      );
+    } else {
+      yellowGradient = ctx.createRadialGradient(
+        points.bluex,
+        points.bluey,
+        0,
+        canvas.width * 0.4,
+        0,
+        canvas.width * 0.9
+      );
     }
-
-    const drawBlueRightGradient = () => {
-        const blueRightGradient = ctx.createRadialGradient(points.bluerightx, points.bluerighty, 0, canvas.width * 0.7, 0, canvas.width / 1.5);
-        blueRightGradient.addColorStop(0, points.blueRightColor.slice(0, points.blueRightColor.length - 2) + '0.8)');
-        blueRightGradient.addColorStop(0.95, points.blueRightColor.slice(0, points.blueRightColor.length - 2) + '0)');
-        ctx.fillStyle = blueRightGradient;
-        ctx.filter = "blur(100px)";
-        ctx.beginPath();
-        ctx.ellipse(canvas.width * 0.6, canvas.height * 0.5, canvas.height / 1.5, canvas.height / 3.5, 0.3, 0, Math.PI * 2);
-        ctx.fill();
+    yellowGradient.addColorStop(
+      0.4,
+      points.yellowColor.slice(0, points.blueColor.length - 2) + points.colorTransition + ")"
+    );
+    yellowGradient.addColorStop(0.95, points.yellowColor.slice(0, points.blueColor.length - 2) + "0)");
+    ctx.fillStyle = yellowGradient;
+    ctx.filter = "blur(80px)";
+    ctx.beginPath();
+    if (canvas.width > 768) {
+      ctx.ellipse(
+        canvas.width * 0.5,
+        -canvas.height * 0.35,
+        canvas.width / 1.5,
+        canvas.height / 1.5,
+        0.5,
+        0,
+        Math.PI * 2
+      );
+    } else {
+      ctx.ellipse(
+        canvas.width / 2,
+        -canvas.height * 0.4,
+        canvas.width * 1,
+        canvas.height * 0.8,
+        1,
+        0,
+        Math.PI * 2
+      );
     }
-    let tl = gsap.timeline({repeat: -1, yoyo: true});
-    const animate = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        drawBlueRightGradient()
-        drawYellowGradient()
-        drawBlueGradient()
+    ctx.fill();
+  };
 
+
+  let tl = gsap.timeline({ repeat: -1, yoyo: true });
+  const animate = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBg()
+    drawYellowGradient();
+    drawBlueGradient();
+  };
+
+  const init = () => {
+    if (canvas.width > 768) {
+      tl.to(points, {
+        duration: 6,
+        delay: 1.4,
+        bluex: canvas.width * 0.9,
+        bluey: -canvas.height * 0.5,
+        yellowx: canvas.width / 2,
+        yellowy: canvas.height / 4,
+        bluerightx: canvas.width * 1,
+        bluerighty: canvas.height * 0.3,
+        onUpdate: animate,
+        colorTransition: 1,
+        blueRightColor: "rgba(15, 30, 83, 1)",
+        ease: "sine.inOut",
+      });
+    } else {
+      points.bluex = 0;
+      points.bluey = -canvas.height * 0.6;
+      points.bluerightx = canvas.width * 0.7;
+      points.bluerighty = canvas.width * 0.5;
+      tl.to(points, {
+        duration: 6,
+        delay: 1.4,
+        bluex: canvas.width * 0.9,
+        bluey: -canvas.height * 0.4,
+        yellowx: canvas.width / 2,
+        yellowy: canvas.height / 4,
+        bluerightx: canvas.width * 0.2,
+        bluerighty: canvas.height * 0.1,
+        onUpdate: animate,
+        colorTransition: 1,
+        blueRightColor: "rgba(15, 30, 83, 1)",
+        ease: "sine.inOut",
+      });
     }
-    
-    const init = () => {
-        
-        if (canvas.width > 768) {
-            tl.to(points, {
-                duration: 6,
-                delay: 1.4,
-                bluex: canvas.width * 0.9,
-                bluey: -canvas.height * 0.5,
-                yellowx: canvas.width / 2,
-                yellowy: canvas.height / 4,
-                bluerightx: canvas.width * 1,
-                bluerighty: canvas.height * 0.3,
-                onUpdate: animate,
-                blueColor:'rgba(238, 186, 66, 1)',
-                yellowColor: 'rgba(13, 63, 244, 1)',
-                blueRightColor: 'rgba(15, 30, 83, 1)',
-                ease: "sine.inOut"
-            });
-        } else {
-            points.bluex = 0
-            points.bluey = -canvas.height * 0.6
-            points.bluerightx = canvas.width * 0.7
-            points.bluerighty = canvas.width * 0.5
-            tl.to(points, {
-                duration: 6,
-                delay: 1.4,
-                bluex: canvas.width * 0.9,
-                bluey: -canvas.height * 0.4,
-                yellowx: canvas.width / 2,
-                yellowy: canvas.height / 4,
-                bluerightx: canvas.width * 0.2,
-                bluerighty: canvas.height * 0.1,
-                onUpdate: animate,
-                blueColor:'rgba(238, 186, 66, 1)',
-                yellowColor: 'rgba(13, 63, 244, 1)',
-                blueRightColor: 'rgba(15, 30, 83, 1)',
-                ease: "sine.inOut"
-            });
-        }
-    }
-    window.addEventListener('resize', () => init())
+  };
+  window.addEventListener("resize", () => init());
 
-    init()
-
+  init();
 </script>
-
