@@ -22,14 +22,11 @@
   let points = {
     bluex: canvas.width * 0.4,
     bluey: -canvas.height * 0.25,
-    blueColor: "rgba(13, 63, 244, 1)",
     yellowx: canvas.width / 3,
     yellowy: canvas.height / 10,
-    yellowColor: "rgba(238, 186, 66, 1)",
-    bluerightx: canvas.width * 0.9,
-    bluerighty: canvas.height * 0.6,
-    blueRightColor: "rgba(63, 101, 240, 1)",
     colorTransition: 0,
+    yellowColor: "rgba(238, 186, 66, 1)",
+    blueColor: "rgba(13, 63, 244, 1)",
   };
 
   const drawBg = () => {
@@ -198,18 +195,13 @@
         bluey: -canvas.height * 0.5,
         yellowx: canvas.width / 2,
         yellowy: canvas.height / 4,
-        bluerightx: canvas.width * 1,
-        bluerighty: canvas.height * 0.3,
         onUpdate: animate,
         colorTransition: 1,
-        blueRightColor: "rgba(15, 30, 83, 1)",
         ease: "sine.inOut",
       });
     } else {
       points.bluex = 0;
       points.bluey = -canvas.height * 0.6;
-      points.bluerightx = canvas.width * 0.7;
-      points.bluerighty = canvas.width * 0.5;
       tl.to(points, {
         duration: 6,
         delay: 1.4,
@@ -217,11 +209,8 @@
         bluey: -canvas.height * 0.4,
         yellowx: canvas.width / 2,
         yellowy: canvas.height / 4,
-        bluerightx: canvas.width * 0.2,
-        bluerighty: canvas.height * 0.1,
         onUpdate: animate,
         colorTransition: 1,
-        blueRightColor: "rgba(15, 30, 83, 1)",
         ease: "sine.inOut",
       });
     }
